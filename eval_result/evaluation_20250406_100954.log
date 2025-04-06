@@ -1,0 +1,24 @@
+2025-04-06 10:09:54,099 - INFO - Starting evaluation process
+2025-04-06 10:09:54,100 - INFO - Configuration: {'predicted_sql_path': './exp_result/predict_mini_dev_gpt-4_cot_SQLite.json', 'ground_truth_path': './data/mini_dev_sqlite_gold.sql', 'db_root_path': './data/dev_databases/', 'num_cpus': 15, 'meta_time_out': 5.0, 'diff_json_path': './data/mini_dev_sqlite.json', 'sql_dialect': 'SQLite', 'output_log_path': './eval_result/predict_mini_dev_gpt-4_cot_SQLite.txt', 'metric': 'ves', 'iterate_num': 100, 'log_level': 'INFO'}
+2025-04-06 10:09:54,100 - INFO - Packaging SQL queries...
+2025-04-06 10:09:54,101 - INFO - Packaged 500 query pairs
+2025-04-06 10:09:54,101 - INFO - Starting query execution...
+2025-04-06 10:09:54,101 - INFO - Starting parallel execution with 15 CPUs
+2025-04-06 10:09:54,101 - INFO - Total queries to process: 500
+2025-04-06 10:09:54,101 - INFO - Metric type: ves
+2025-04-06 10:09:54,101 - INFO - Iterations per query: 100
+2025-04-06 10:21:55,786 - INFO - Parallel execution completed in 721.68 seconds
+2025-04-06 10:21:55,786 - INFO - Average time per query: 1.44 seconds
+2025-04-06 10:21:55,787 - INFO - Calculating VES scores...
+2025-04-06 10:21:55,788 - INFO - Processing 500 execution results against 500 difficulty entries
+2025-04-06 10:22:00,830 - INFO - Results distribution - Simple: 148, Moderate: 250, Challenging: 102
+2025-04-06 10:22:00,831 - INFO - Simple queries (148): 63.59%
+2025-04-06 10:22:00,831 - INFO - Moderate queries (250): 41.45%
+2025-04-06 10:22:00,831 - INFO - Challenging queries (102): 33.19%
+2025-04-06 10:22:00,831 - INFO - Overall score (500): 46.32%
+2025-04-06 10:22:00,832 - INFO - ====================================================================================================
+2025-04-06 10:22:00,832 - INFO - Finished VES evaluation for SQLite on Mini Dev set
+2025-04-06 10:22:00,832 - INFO - 
+
+
+2025-04-06 10:22:00,832 - INFO - Cleaning up resources...
