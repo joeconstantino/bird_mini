@@ -8,6 +8,7 @@ from evaluation_utils import (
     package_sqls,
     sort_results,
     print_data,
+    load_json,
 )
 
 
@@ -69,7 +70,7 @@ def run_sqls_parallel(
 def compute_acc_by_diff(exec_results, diff_json_path):
     num_queries = len(exec_results)
     results = [res["res"] for res in exec_results]
-    contents = load_jsonl(diff_json_path)
+    contents = load_json(diff_json_path)
     simple_results, moderate_results, challenging_results = [], [], []
 
     for i, content in enumerate(contents):
