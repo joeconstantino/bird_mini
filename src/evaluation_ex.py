@@ -107,7 +107,7 @@ def compute_acc_by_diff(exec_results, diff_json_path):
     )
 
 
-if __name__ == "__main__":
+def main():
     args_parser = argparse.ArgumentParser()
     args_parser.add_argument(
         "--predicted_sql_path", type=str, required=False, default="./exp_result/predict_mini_dev_gpt-4_cot_SQLite.json"
@@ -155,3 +155,7 @@ if __name__ == "__main__":
     )
     print(f"Finished EX evaluation for {args.sql_dialect} on Mini Dev set")
     print("\n\n")
+
+
+if __name__ == "__main__":
+    main()

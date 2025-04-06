@@ -61,9 +61,9 @@ The dataset contains the main following resources:
   - PostgreSQL: [`./data/mini_dev_postgresql_gold.sql`](./data/mini_dev_postgresql_gold.sql)
 - `src`: Contains source codes for evaluation and model interaction:
   - Evaluation scripts: `evaluation_ex.py`, `evaluation_ves.py`, `evaluation_f1.py`
-  - Model interaction: `gpt_request.py`, `prompt.py`
+  - Model interaction: `generation.py`, `prompt.py`
   - Utility scripts: `evaluation_utils.py`, `table_schema.py`
-  - Shell scripts: `run_gpt.sh`, `run_evaluation.sh`
+  - Shell scripts: `run_generation.sh`, `run_evaluation.sh`
 
 
 
@@ -130,7 +130,7 @@ Use this script to run the OpenAI model on the Azure cloud. (you may need to adj
 
 ```bash
 cd ./src/
-sh ./run_gpt.sh
+sh ./run_generation.sh
 ```
 
 

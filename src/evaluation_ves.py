@@ -191,7 +191,7 @@ def print_reward_category(exec_results, engine, sql_dialect):
         json.dump(data, file, indent=4)
 
 
-if __name__ == "__main__":
+def main():
     args_parser = argparse.ArgumentParser()
     args_parser.add_argument(
         "--predicted_sql_path", type=str, required=True, default=""
@@ -238,3 +238,6 @@ if __name__ == "__main__":
     )
     print(f"Finished R-VES evaluation for {args.sql_dialect} on Mini Dev set")
     print("\n\n")
+
+if __name__ == "__main__":
+    main()

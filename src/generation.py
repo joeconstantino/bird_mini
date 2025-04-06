@@ -156,7 +156,7 @@ def collect_response_from_gpt(
     return responses
 
 
-if __name__ == "__main__":
+def main():
     args_parser = argparse.ArgumentParser()
     args_parser.add_argument("--eval_path", type=str, default="./data/mini_dev_sqlite.json")
     args_parser.add_argument("--mode", type=str, default="mini_dev")
@@ -245,3 +245,6 @@ if __name__ == "__main__":
             args.chain_of_thought,
         )
     )
+
+if __name__ == "__main__":
+    main()
