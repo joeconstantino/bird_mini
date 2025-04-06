@@ -1,28 +1,6 @@
 # BIRD-SQL Mini-Dev 
 
-<p align="center">
-  <img src="materials/bird_circle_main.png" style="width: 30%; min-width: 100px; display: block; margin: auto;">
-</p>
-
-<p align="center" width="100%">
-  <a href="https://arxiv.org/abs/2305.03111">🔗Paper</a>
-  <a href="https://bird-bench.github.io/">🏆Leaderboard</a>
-<p>
-
-
-[![License](https://img.shields.io/badge/License-CC%20BY%20SA%204.0-orange.svg)](https://creativecommons.org/licenses/by-sa/4.0/deed.en)
-[![Data Link](https://img.shields.io/badge/Download-MiniDev-green.svg)](https://bird-bench.oss-cn-beijing.aliyuncs.com/minidev.zip)
-[![Python 3.11+](https://img.shields.io/badge/Python-3.11+-teal.svg)](https://www.python.org/downloads/)
-[![Leaderboard 1.8+](https://img.shields.io/badge/Leaderboard-2023-pink.svg)](https://bird-bench.github.io/)
-[![OpenAI 1.30+](https://img.shields.io/badge/OpenAI-1.30+-beige.svg)](https://pypi.org/project/openai/)
-[![SQLite 3.41+](https://img.shields.io/badge/SQLite-3.41+-blue.svg)](https://sqlite.org/download.html)
-[![MySQL 8.40+](https://img.shields.io/badge/MySQL-8.40+-violet.svg)](https://dev.mysql.com/downloads/installer/)
-[![PostgreSQL 14.12+](https://img.shields.io/badge/PostgreSQL-14.12+-magenta.svg)](https://www.postgresql.org/download/)
-
-
-<p align="center" width="100%">
-<a><img src="materials/intro.png" style="width: 100%; min-width: 300px; display: block; margin: auto;"></a>
-</p>
+[![Data Link]](https://bird-bench.oss-cn-beijing.aliyuncs.com/minidev.zip)
 
 
 ## Overview
@@ -67,18 +45,25 @@ Below are some key statistics of the mini-dev dataset:
 
 The dataset contains the main following resources:
 
-- `database`: The database should be stored under the [`./mini_dev_data/dev_databases/`](./mini_dev_data/dev_databases/). In each database folder, it has two components:
+- `database`: The database should be stored under the [`./data/dev_databases/`](./data/dev_databases/). In each database folder, it has two components:
   - `database_description`: the csv files are manufactured to describe database schema and its values for models to explore or references.
   - `sqlite`: The database contents in BIRD.
 > [!NOTE] 
 > You have to download the latest dev databases in order to construct database in the MySQL and PostgreSQL. If you use the SQLite version only, you can use the original dev databases.
-- `data`: Each text-to-SQL pairs with the oracle knowledge evidence is stored as a json file, i.e., `mini_dev_sqlite.json` is stored on [`./mini_dev_data/mini_dev_sqlite.json`](./mini_dev_data/mini_dev_sqlite.json). In each json file, it has three main parts:
+- `data`: Each text-to-SQL pairs with the oracle knowledge evidence is stored as a json file, i.e., `mini_dev_sqlite.json` is stored on [`./data/mini_dev_sqlite.json`](./data/mini_dev_sqlite.json). In each json file, it has three main parts:
   - `db_id`: the names of databases
   - `question`: the questions curated by human crowdsourcing according to database descriptions, database contents.
   - `evidence`: the external knowledge evidence annotated by experts for assistance of models or SQL annotators.
   - `SQL`: SQLs annotated by crowdsource referring to database descriptions, database contents, to answer the questions accurately.
-- `ground-truth SQL file`: The SQL file should be stored at [`./llm/mini_dev_data/mini_dev_sqlite_gold.sql`](./llm/mini_dev_data/mini_dev_sqlite_gold.sql).
-- `llm`: It contains source codes to convert texts to SQLs by calling APIs from LLMs, such as  `GPT35-turbo-instruct`, `gpt-35-turbo`, `gpt-4`, `gpt-4-32k`, and `gpt-4-turbo`.
+- `ground-truth SQL file`: The SQL files are stored in the `data` directory:
+  - SQLite: [`./data/mini_dev_sqlite_gold.sql`](./data/mini_dev_sqlite_gold.sql)
+  - MySQL: [`./data/mini_dev_mysql_gold.sql`](./data/mini_dev_mysql_gold.sql)
+  - PostgreSQL: [`./data/mini_dev_postgresql_gold.sql`](./data/mini_dev_postgresql_gold.sql)
+- `src`: Contains source codes for evaluation and model interaction:
+  - Evaluation scripts: `evaluation_ex.py`, `evaluation_ves.py`, `evaluation_f1.py`
+  - Model interaction: `gpt_request.py`, `prompt.py`
+  - Utility scripts: `evaluation_utils.py`, `table_schema.py`
+  - Shell scripts: `run_gpt.sh`, `run_evaluation.sh`
 
 
 
@@ -136,7 +121,7 @@ First, you need install openai in your python environment by:
 
 ```bash
 conda create -n BIRD python=3.11.5
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 
 ### Collect results
@@ -144,8 +129,8 @@ pip install requirements.txt
 Use this script to run the OpenAI model on the Azure cloud. (you may need to adjust parameters and paths with your preference):
 
 ```bash
-cd ./llm/
-sh ./run/run_gpt.sh
+cd ./src/
+sh ./run_gpt.sh
 ```
 
 
@@ -153,22 +138,22 @@ sh ./run/run_gpt.sh
 
 ### Execution (EX) Evaluation:
 
-Please post-process your collected results as the format: SQL and its `db_id`, which is splitted by `'\t----- bird -----\t'`. The examples are shown in the [`./llm/exp_result/turbo_output/predict_mini_dev_gpt-4-turbo_cot_SQLite.json`](./llm/exp_result/turbo_output/predict_mini_dev_gpt-4-turbo_cot_SQLite.json). Put the ground-truth sql file in the [`./data/`](./data/). And you may need to design a ChatGPT tag by your own.
-The main file for ex evaluation is located at [`./llm/src/evaluation_ex.py`](./llm/src/evaluation_ex.py). \
+Please post-process your collected results as the format: SQL and its `db_id`, which is splitted by `'\t----- bird -----\t'`. The examples are shown in the [`./exp_result/turbo_output/predict_mini_dev_gpt-4-turbo_cot_SQLite.json`](./exp_result/turbo_output/predict_mini_dev_gpt-4-turbo_cot_SQLite.json). Put the ground-truth sql file in the [`./data/`](./data/). And you may need to design a ChatGPT tag by your own.
+The main file for ex evaluation is located at [`./src/evaluation_ex.py`](./src/evaluation_ex.py). \
 Then you could evaluate the results by the following command line :
 
 ```bash
-cd ./llm/
-sh ./run/run_evaluation.sh
+cd ./src/
+sh ./run_evaluation.sh
 ```
 
 ### Reward-based Valid Efficiency Score (R-VES):
-The main file for R-VES evaluation is located at [`./llm/src/evaluation_ves.py`](./llm/src/evaluation_ves.py).
+The main file for R-VES evaluation is located at [`./src/evaluation_ves.py`](./src/evaluation_ves.py).
 R-VES and EX can be evaluated in the same shell, so you can eval your efficiency via:
 
 ```bash
-cd ./llm/
-sh ./run/run_evaluation.sh
+cd ./src/
+sh ./run_evaluation.sh
 ```
 (For stable R-VES, you may need to enlarge `timeout` or repeat and average results. In our test evaluation, we will enlarge `timeout` to 3 s/ex; then we repeat 5 times for VES computation, only the highest results will be reported.)
 
@@ -180,11 +165,11 @@ In the latest version, we adjust the VES evaluation to be more stable and reliab
 
 
 ### Soft F1-Score Evaluation:
-The main file for Soft F1-Score evaluation is located at [`./llm/src/evaluation_f1.py`](./llm/src/evaluation_f1.py). Soft-F1, VES and EX can be evaluated in the same shell, so you can eval your efficiency via:
+The main file for Soft F1-Score evaluation is located at [`./src/evaluation_f1.py`](./src/evaluation_f1.py). Soft-F1, VES and EX can be evaluated in the same shell, so you can eval your efficiency via:
 
 ```bash
-cd ./llm/
-sh ./run/run_evaluation.sh
+cd ./src/
+sh ./run_evaluation.sh
 ```
 #### Soft F1-Score:
 Alongside the update to the Mini-Dev set, we introduced a new evaluation metric—the soft F1-score. This metric is specifically designed to assess the performance of text-to-SQL models by measuring the similarity between the tables produced by predicted SQL queries and those from the ground truth. In a nutshell, the soft F1-score is a more lenient metric that reduces the impact of column order and missing values in the tables produced by predicted SQL queries.
@@ -219,99 +204,3 @@ The soft F1-score is calculated as follows:
 * Precision = tp / (tp + fp) = 4 / 5 = 0.8
 * Recall = tp / (tp + fn) = 4 / 5 = 0.8
 * F1 = 2 * Precision * Recall / (Precision + Recall) = 0.8
-
-## Baseline performance on Mini-Dev Dataset
-
-###  EX Evaluation
-|                        | SQLite | MySQL | PostgreSQL |
-|------------------------|:------:|:-----:|:----------:|
-| **mixtral-8x7b**     | 21.60  | 13.60| 12.40     |
-| **llama3-8b-instruct**          | 24.40  | 24.60 | 18.40      |
-|**phi-3-medium-128k-instruct**            | 30.60 | 25.00 | 21.60 |
-| **gpt-35-turbo-instruct** | 33.60  | 31.20 | 26.60      |
-| **gpt-35-turbo**       | 38.00  | 36.00 | 27.40      |
-| **llama3-70b-instruct**         | 40.80  | 37.00 | 29.40      |
-| **TA + gpt-35-turbo**       | 41.60  | - | -      |
-| **TA + llama3-70b-instruct**  | 42.80 | -    |-     |
-| **gpt-4-turbo**        | 45.80  | 41.00 | 36.00      |
-| **gpt-4-32k**        | 47.00  | 43.20 | 35.00       |
-| **gpt-4**        | 47.80  | 40.80 | 35.80      |
-| **TA + gpt-4-turbo**        | 58.00  | - | -      |
-| **TA + gpt-4o**        | 63.00  | - | -      |
-
-
-### R-VES Evaluation
-|                        | SQLite | MySQL | PostgreSQL |
-|------------------------|:------:|:-----:|:----------:|
-| **mixtral-8x7b**     | 20.41  | 12.99 | 14.16     |
-| **llama3-8b-instruct**          | 23.27  | 23.66 | 17.90      |
-|**phi-3-medium-128k-instruct**| 29.54 | 24.12 | 21.07 |
-| **gpt-35-turbo-instruct** | 32.28  | 30.39 | 26.14      |
-| **gpt-35-turbo**       | 37.33  | 34.94 | 26.80      |
-| **llama3-70b-instruct**         | 39.02  | 35.82 | 28.80      |
-| **TA + gpt-35-turbo**       | 40.59  | - | -      |
-| **TA + llama3-70b-instruct**  | 41.37 | -    | -      |
-| **gpt-4-turbo**        | 44.79  | 39.37 | 35.23      |
-| **gpt-4-32k**        | 45.29  | 42.79 | 34.59     |
-| **gpt-4**        | 45.91  | 39.92 | 35.24       |
-| **TA + gpt-4-turbo**        | 56.44   | - | -      |
-| **TA + gpt-4o**        | 60.86  | - | -      |
-
-
-### Soft F1-Score Evaluation
-|                        | SQLite | MySQL | PostgreSQL |
-|------------------------|:------:|:-----:|:----------:|
-| **mixtral-8x7b**     | 22.95  | 13.79 | 14.70      |
-| **llama3-8b-instruct**          | 27.87  | 27.49 | 19.35      |
-|**phi-3-medium-128k-instruct**                | 35.33 | 28.73  | 24.11  |
-| **gpt-35-turbo-instruct** | 36.34  | 33.85 | 28.30      |
-| **gpt-35-turbo**       | 41.84  | 40.75 | 30.22      |
-| **TA + gpt-35-turbo**       | 44.25  | - | -      |
-| **llama3-70b-instruct**         | 44.38  | 40.95 | 31.43      |
-| **TA + llama3-70b-instruct**  | 46.66 | -    | -      |
-| **gpt-4-turbo**        | 50.08  | 45.96 | 38.36      |
-| **gpt-4-32k**        | 51.92  | 47.38 | 39.55      |
-| **gpt-4**        | 52.69 | 45.78 | 38.96       |
-| **TA + gpt-4-turbo**        | 62.40   | - | -      |
-| **TA + gpt-4o**        | 66.97  | - | -      |
-
-### Predict SQLs
-We drop the predicted SQLs of baseline models under `./llm/exp_result/sql_output_kg/` for reference.
-
-### Time Ratio Distribution
-<p align="center" width="100%">
-<a><img src="materials/time_ratio_sqlite.png" style="width: 100%; min-width: 300px; display: block; margin: auto;"></a>
-</p>
-
-
-
-
-## Acknowledgement
-Main contributors to the Mini-Dev project: Xiaolong Li, Jinyang Li, Ge Qu, Binyuan Hui, Reynold Cheng, Chenhao Ma.
-
-We extend our sincere gratitude to the invaluable feedbacks from the open community, including github reviewers (@freiz @nnarodytska @josem7 @wbbeyourself @ronch99 @tshu-w ) and those who reached out to us via email with their valuable suggestions.
-
-For any questions, please contact us by bird.bench23@gmail.com.
-
-## My To-Do List  
-  
-- [x] Release BIRD MINI DEV
-- [x] Implement [`TA-SQL`](https://github.com/quge2023/TA-SQL) as ICL Reasoning Baseline.
-- [ ] Implement more open-source LLMs.
-- [x] Release cleaner dev.json.
-- [ ] Release cleaner train.json.
-- [ ] BIRD-SQL 2024-2025, a broad new research problem.
-
-## Citation
-
-Please cite the repo if you think our work is helpful to you.
-
-```
-@article{li2024can,
-  title={Can llm already serve as a database interface? a big bench for large-scale database grounded text-to-sqls},
-  author={Li, Jinyang and Hui, Binyuan and Qu, Ge and Yang, Jiaxi and Li, Binhua and Li, Bowen and Wang, Bailin and Qin, Bowen and Geng, Ruiying and Huo, Nan and others},
-  journal={Advances in Neural Information Processing Systems},
-  volume={36},
-  year={2024}
-}
-```
