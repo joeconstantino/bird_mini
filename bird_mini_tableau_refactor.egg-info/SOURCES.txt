@@ -1,0 +1,7 @@
+README.md
+pyproject.toml
+bird_mini_tableau_refactor.egg-info/PKG-INFO
+bird_mini_tableau_refactor.egg-info/SOURCES.txt
+bird_mini_tableau_refactor.egg-info/dependency_links.txt
+bird_mini_tableau_refactor.egg-info/requires.txt
+bird_mini_tableau_refactor.egg-info/top_level.txt

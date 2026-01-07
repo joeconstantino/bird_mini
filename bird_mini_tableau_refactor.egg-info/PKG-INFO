@@ -1,0 +1,163 @@
+Metadata-Version: 2.4
+Name: bird-mini-tableau-refactor
+Version: 0.1.0
+Summary: Refactored BIRD Mini Text-to-SQL benchmark for evaluating agents that generte and VizQL Data Service against Tableau published data sources
+Author-email: Joe Constantino <joe.constantino3@gmail.com>
+License: MIT
+Project-URL: Homepage, https://github.com/yourusername/bird_mini
+Project-URL: Repository, https://github.com/yourusername/bird_mini
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: pandas>=2.0.0
+Requires-Dist: requests>=2.32.0
+Requires-Dist: psycopg2-binary>=2.9.0
+Requires-Dist: sqlalchemy>=2.0.0
+Requires-Dist: python-dotenv>=1.0.0
+Provides-Extra: dev
+Requires-Dist: jupyter>=1.0.0; extra == "dev"
+Requires-Dist: ipython>=8.0.0; extra == "dev"
+Provides-Extra: notebook
+Requires-Dist: jupyter>=1.0.0; extra == "notebook"
+Requires-Dist: ipython>=8.0.0; extra == "notebook"
+Requires-Dist: notebook>=7.0.0; extra == "notebook"
+Provides-Extra: test
+Requires-Dist: pytest>=7.0.0; extra == "test"
+Requires-Dist: pytest-cov>=4.0.0; extra == "test"
+
+# BIRD Mini - Text-to-SQL and VizQL Data Service Benchmark
+
+This project contains benchmarks for evaluating Text-to-SQL queries and VizQL Data Service queries (using Tableau).
+
+## Setup
+
+### Prerequisites
+
+- Python 3.8 or higher
+- Access to a PostgreSQL database (or use the provided connection details)
+- Access to a Tableau environment running 25.3+
+
+### Installation
+
+#### Option 1: Using pip with pyproject.toml (Recommended)
+
+```bash
+# Install dependencies
+pip install -e .
+
+# Or install with notebook support
+pip install -e ".[notebook]"
+
+# Or install with development tools
+pip install -e ".[dev]"
+```
+
+#### Option 2: Using requirements.txt (Legacy)
+
+```bash
+pip install -r requirements.txt
+```
+
+### Environment Configuration
+
+1. Copy the example environment file:
+   ```bash
+   cp env.example .env
+   ```
+
+2. Edit `.env` and fill in your actual credentials:
+   - PostgreSQL database credentials
+   - Tableau Server details
+   - Tableau Personal Access Token
+
+**Note:** The `.env` file is gitignored and should never be committed to version control.
+
+## Project Structure
+
+```
+bird_mini/
+├── data/
+│   ├── dev_databases/                    # SQLite databases for various domains
+│   │   ├── california_schools/           # California schools database
+│   │   ├── card_games/                   # Card games database
+│   │   ├── codebase_community/           # Stack Overflow-style database
+│   │   ├── debit_card_specializing/      # Debit card transactions
+│   │   ├── european_football_2/          # European football data
+│   │   ├── financial/                    # Financial transactions
+│   │   ├── formula_1/                    # F1 racing data
+│   │   ├── student_club/                 # Student club data
+│   │   ├── superhero/                    # Superhero database
+│   │   ├── thrombosis_prediction/        # Medical data
+│   │   └── toxicology/                   # Toxicology data
+│   ├── tableau_datasources/              # Tableau data source files (.tdsx)
+│   │   └── california_schools/           # California schools Tableau datasources
+│   │       ├── california_schools_fprm_satscores.tdsx
+│   │       ├── california_schools_frpm_schools.tdsx
+│   │       └── california_schools_satscores_schools.tdsx
+│   ├── test_cases/                       # Test case notebooks and JSON files
+│   │   ├── california_schools_sql_samples.ipynb       # SQL test cases notebook
+│   │   ├── california_schools_vds_samples.ipynb       # VizQL test cases notebook
+│   │   ├── mini_dev_postgresql.json      # PostgreSQL test cases
+│   │   ├── mini_dev_postgresql_vds.json  # VizQL test cases
+│   │   ├── mini_dev_postgresql_gold.sql  # Gold standard PostgreSQL queries
+│   │   ├── mini_dev_sqlite.json          # SQLite test cases
+│   │   ├── mini_dev_sqlite_gold.sql      # Gold standard SQLite queries
+│   │   ├── mini_dev_mysql.json           # MySQL test cases
+│   │   └── mini_dev_mysql_gold.sql       # Gold standard MySQL queries
+│   └── dev_tables.json                   # Table metadata
+├── src/
+│   ├── evaluation.py                     # Evaluation scripts
+│   ├── generation.py                     # Query generation scripts
+│   ├── prompt.py                         # Prompt templates
+│   ├── run_evaluation.sh                 # Shell script for evaluation
+│   ├── run_generation.sh                 # Shell script for generation
+│   └── table_schema.py                   # Table schema utilities
+├── eval_result/                          # Evaluation results
+├── bird_mini_california_schools(VizQL Data Service).ipynb  # VizQL queries notebook
+├── pyproject.toml                        # Python project configuration and dependencies
+├── requirements.txt                      # Legacy requirements file
+└── env.example                           # Example environment variables file
+```
+
+## Usage
+
+### Running SQL Queries (PostgreSQL)
+
+1. Open `data/test_cases/california_schools_sql_samples.ipynb` in Jupyter
+2. Ensure your PostgreSQL credentials are set in `.env`
+3. Run the cells to execute SQL queries from the test cases
+
+### Running VizQL Data Service Queries
+
+1. Open `data/test_cases/california_schools_vds_samples.ipynb` in Jupyter
+2. Ensure your Tableau Server credentials and datasource LUIDs are configured in `.env`
+3. Run the cells to execute VizQL queries against published Tableau datasources
+
+The test cases use the following datasource variables:
+- `california_schools_fprm_satscores`: FRPM + SAT Scores joined datasource
+- `california_schools_frpm_schools`: FRPM + Schools joined datasource
+- `california_schools_satscores_schools`: SAT Scores + Schools joined datasource
+
+## Datasources
+
+The project requires three Tableau datasources:
+1. **california_schools_fprm_satscores**: Combines Free/Reduced Price Meals data with SAT scores
+2. **california_schools_frpm_schools**: Combines FRPM data with school information
+3. **california_schools_satscores_schools**: Combines SAT scores with school information
+
+## Test Cases
+
+Test cases are organized by question ID and include:
+- Natural language question
+- Evidence/hints for query construction  
+- SQL query (for PostgreSQL tests)
+- VizQL query structure (for VizQL tests)
+- Difficulty level
+- AI-summarized expected answer
+
+## Contributing
+
+When adding new test cases:
+1. Add SQL queries to `data/mini_dev_postgresql.json`
+2. Add VizQL queries to `data/mini_dev_vds.json`
+3. Ensure queries follow the existing structure
+4. Test queries in the respective notebooks

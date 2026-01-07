@@ -1,206 +1,153 @@
-# BIRD-SQL Mini-Dev 
+# BIRD Mini - Text-to-SQL and VizQL Data Service Benchmark
 
-[![Data Link]](https://bird-bench.oss-cn-beijing.aliyuncs.com/minidev.zip)
+This project contains benchmarks for evaluating Text-to-SQL queries and VizQL Data Service queries (using Tableau).
 
+## Setup
 
-## Overview
-Here, we provide a Lite version of developtment dataset: **Mini-Dev**. This mini-dev dataset is designed to facilitate efficient and cost-effective development cycles, especially for testing and refining SQL query generation models. This dataset results from community feedback, leading to the compilation of 500 high-quality text2sql pairs derived from 11 distinct databases in a development environment. To further enhance the practicality of the BIRD system in industry settings and support the development of text-to-SQL models, we make the Mini-Dev dataset available in both **MySQL** and **PostgreSQL**.
+### Prerequisites
 
-Additionally, we introduce two new evaluation metrics for the Mini-Dev dataset: the **Reward-based Valid Efficiency Score (R-VES)** and the **Soft F1-Score**. These metrics aim to evaluate the efficiency and accuracy of text-to-SQL models, respectively. It is important to note that the both metrics, currently in their beta version, applies exclusively to the Mini-Dev dataset using baseline models.
+- Python 3.8 or higher
+- Access to a PostgreSQL database (or use the provided connection details)
+- Access to a Tableau environment running 25.3+
 
-We welcome contributions and suggestions for enhancing these metrics, particularly regarding their integration into existing leaderboards. Please do not hesitate to contact us if you are interested in these developments or have any proposals for improvements.
+### Installation
 
-
-Below are some key statistics of the mini-dev dataset:
-
-### Difficulty Distribution
-- **Simple:** 30%
-- **Moderate:** 50%
-- **Challenging:** 20%
-
-### Database Distribution
-- **Debit Card Specializing:** 30 instances
-- **Student Club:** 48 instances
-- **Thrombosis Prediction:** 50 instances
-- **European Football 2:** 51 instances
-- **Formula 1:** 66 instances
-- **Superhero:** 52 instances
-- **Codebase Community:** 49 instances
-- **Card Games:** 52 instances
-- **Toxicology:** 40 instances
-- **California Schools:** 30 instances
-- **Financial:** 32 instances
-
-### Keywords Statistic
-
-- **Main Body Keywords** •SELECT •FROM •WHERE •AND •OR •NOT •IN •EXISTS •IS •NULL •IIF •CASE •CASE WHEN.
-- **Join Keywords** • INNER JOIN • LEFT JOIN • ON • AS.
-- **Clause Keywords** • BETWEEN • LIKE • LIMIT • ORDER BY • ASC • DESC • GROUP BY •HAVING •UNION •ALL •EXCEPT •PARTITION BY •OVER.
-- **Aggregation Keywords** • AVG • COUNT • MAX • MIN • ROUND • SUM.
-- **Scalar Keywords** • ABS • LENGTH • STRFTIME • JULIADAY • NOW • CAST • SUBSTR • INSTR.
-- **Comparison Keywords** •= •> •< •>= •<= •!=.
-- **Computing Keywords** •- •+ •* •/.
-
-## Dataset Introduction
-
-The dataset contains the main following resources:
-
-- `database`: The database should be stored under the [`./data/dev_databases/`](./data/dev_databases/). In each database folder, it has two components:
-  - `database_description`: the csv files are manufactured to describe database schema and its values for models to explore or references.
-  - `sqlite`: The database contents in BIRD.
-> [!NOTE] 
-> You have to download the latest dev databases in order to construct database in the MySQL and PostgreSQL. If you use the SQLite version only, you can use the original dev databases.
-- `data`: Each text-to-SQL pairs with the oracle knowledge evidence is stored as a json file, i.e., `mini_dev_sqlite.json` is stored on [`./data/mini_dev_sqlite.json`](./data/mini_dev_sqlite.json). In each json file, it has three main parts:
-  - `db_id`: the names of databases
-  - `question`: the questions curated by human crowdsourcing according to database descriptions, database contents.
-  - `evidence`: the external knowledge evidence annotated by experts for assistance of models or SQL annotators.
-  - `SQL`: SQLs annotated by crowdsource referring to database descriptions, database contents, to answer the questions accurately.
-- `ground-truth SQL file`: The SQL files are stored in the `data` directory:
-  - SQLite: [`./data/mini_dev_sqlite_gold.sql`](./data/mini_dev_sqlite_gold.sql)
-  - MySQL: [`./data/mini_dev_mysql_gold.sql`](./data/mini_dev_mysql_gold.sql)
-  - PostgreSQL: [`./data/mini_dev_postgresql_gold.sql`](./data/mini_dev_postgresql_gold.sql)
-- `src`: Contains source codes for evaluation and model interaction:
-  - Evaluation scripts: `evaluation_ex.py`, `evaluation_ves.py`, `evaluation_f1.py`
-  - Model interaction: `generation.py`, `prompt.py`
-  - Utility scripts: `evaluation_utils.py`, `table_schema.py`
-  - Shell scripts: `run_generation.sh`, `run_evaluation.sh`
-
-
-
-
-## Mini-Dev Dataset in MySQL and PostgreSQL
-
-
-You can locate the SQL queries within the `mini_dev_mysql.json` and `mini_dev_postgresql.json` files. These queries have been transpiled from the original SQLite versions using the sqlglot package, then refined manually and with GPT-4 Turbo. After downloading the Mini-Dev dataset, each database folder will contain .sql and command.script files. Follow the instructions below to set up the database in MySQL and PostgreSQL:
-
-### MySQL
-1. Download and install the MySQL from the official website: https://dev.mysql.com/downloads/mysql/
-2. Set the environment variables: 
-```
-export PATH=$PATH:/usr/local/mysql/bin
-```
-3. Start the MySQL server: 
-```
-sudo /usr/local/mysql/support-files/mysql.server start
-```
-4. Login to the MySQL server and create the database (password will be the one you set during the installation)
-```bash
-mysql -u root -p
-CREATE DATABASE BIRD;
-```
-5. Construct the database by run the following command (You can find MySQL version database: `BIRD_dev.sql` in the `MINIDEV_mysql` folder):
-```bash
-mysql -u root -p BIRD < BIRD_dev.sql
-```
-6. Examples that how to run mysql query in the Python (with   pymysql) can be find in the [`examples/mysql_example.ipynb`](./examples/mysql_example.ipynb) file.
-
-7. If you encounter the error: "this is incompatible with sql_mode=only_full_group_by", you can run the following command to disable the sql_mode:
-```sql
-select @@global.sql_mode;
-SET GLOBAL sql_mode='{EVERYTHING SHOW IN THE ABOVE COMMAND EXCEPT ONLY_FULL_GROUP_BY}';
-```
-
-### PostgreSQL
-1. Download and install the postgresql from the official website: https://www.postgresql.org/download/ 
-2. Download the pgAdmin4 from the official website: https://www.pgadmin.org/download/ (Recommended to monitor the database)
-3. In pgADmin4/terminal create a new database called `BIRD`
-4. Construct the database by run the following command (You can find PostgreSQL version database:`BIRD_dev.sql` in the `MINIDEV_postgresql` folder):
-```bash
-psql -U USERNAME -d BIRD -f BIRD_dev.sql
-```
-5. Examples that how to run mysql query in the Python (with Psycopg) can be find in the  [`examples/postgresql_example.ipynb`](./examples/postgresql_example.ipynb) file.
-
-
-
-
-## In-Context Learning (ICL):
-
-### Environment Setup:
-
-First, you need install openai in your python environment by:
+#### Option 1: Using pip with pyproject.toml (Recommended)
 
 ```bash
-conda create -n BIRD python=3.11.5
+# Install dependencies
+pip install -e .
+
+# Or install with notebook support
+pip install -e ".[notebook]"
+
+# Or install with development tools
+pip install -e ".[dev]"
+```
+
+#### Setting Up a specific Jupyter Kernel for notebook execution (optional)
+
+After installing dependencies, register the Python environment as a Jupyter kernel:
+
+```bash
+# Install Jupyter if not already installed
+python -m pip install jupyter ipykernel
+
+# Register the kernel
+python -m ipykernel install --user --name=bird-mini --display-name="Python (bird-mini)"
+```
+
+Now when you open the notebooks, select **"Python (bird-mini)"**, or whichever python environment you installed the dependencies into, as the kernel from the kernel menu.
+
+#### Option 2: Using requirements.txt (Legacy)
+
+```bash
 pip install -r requirements.txt
 ```
 
-### Collect results
+### Environment Configuration
 
-Use this script to run the OpenAI model on the Azure cloud. (you may need to adjust parameters and paths with your preference):
+1. Copy the example environment file:
+   ```bash
+   cp env.example .env
+   ```
 
-```bash
-cd ./src/
-sh ./run_generation.sh
+2. Edit `.env` and fill in your actual credentials:
+   - PostgreSQL database credentials
+   - Tableau Server details
+   - Tableau Personal Access Token
+
+**Note:** The `.env` file is gitignored and should never be committed to version control.
+
+## Project Structure
+
+```
+bird_mini/
+├── data/
+│   ├── dev_databases/                    # SQLite databases for various domains
+│   │   ├── california_schools/           # California schools database
+│   │   ├── card_games/                   # Card games database
+│   │   ├── codebase_community/           # Stack Overflow-style database
+│   │   ├── debit_card_specializing/      # Debit card transactions
+│   │   ├── european_football_2/          # European football data
+│   │   ├── financial/                    # Financial transactions
+│   │   ├── formula_1/                    # F1 racing data
+│   │   ├── student_club/                 # Student club data
+│   │   ├── superhero/                    # Superhero database
+│   │   ├── thrombosis_prediction/        # Medical data
+│   │   └── toxicology/                   # Toxicology data
+│   ├── tableau_datasources/              # Tableau data source files (.tdsx)
+│   │   └── california_schools/           # California schools Tableau datasources
+│   │       ├── california_schools_fprm_satscores.tdsx
+│   │       ├── california_schools_frpm_schools.tdsx
+│   │       └── california_schools_satscores_schools.tdsx
+│   ├── test_cases/                       # Test case notebooks and JSON files
+│   │   ├── california_schools_sql_samples.ipynb       # SQL test cases notebook
+│   │   ├── california_schools_vds_samples.ipynb       # VizQL test cases notebook
+│   │   ├── mini_dev_postgresql.json      # PostgreSQL test cases
+│   │   ├── mini_dev_postgresql_vds.json  # VizQL test cases
+│   │   ├── mini_dev_postgresql_gold.sql  # Gold standard PostgreSQL queries
+│   │   ├── mini_dev_sqlite.json          # SQLite test cases
+│   │   ├── mini_dev_sqlite_gold.sql      # Gold standard SQLite queries
+│   │   ├── mini_dev_mysql.json           # MySQL test cases
+│   │   └── mini_dev_mysql_gold.sql       # Gold standard MySQL queries
+│   └── dev_tables.json                   # Table metadata
+├── src/
+│   ├── evaluation.py                     # Evaluation scripts
+│   ├── generation.py                     # Query generation scripts
+│   ├── prompt.py                         # Prompt templates
+│   ├── run_evaluation.sh                 # Shell script for evaluation
+│   ├── run_generation.sh                 # Shell script for generation
+│   └── table_schema.py                   # Table schema utilities
+├── eval_result/                          # Evaluation results
+├── bird_mini_california_schools(VizQL Data Service).ipynb  # VizQL queries notebook
+├── pyproject.toml                        # Python project configuration and dependencies
+├── requirements.txt                      # Legacy requirements file
+└── env.example                           # Example environment variables file
 ```
 
+## Usage
 
-## Evaluation:
+### Running SQL Queries (PostgreSQL)
 
-### Execution (EX) Evaluation:
+1. Open `data/test_cases/california_schools_sql_samples.ipynb` in Jupyter
+2. **Select the "Python (bird-mini)" kernel** from the kernel menu (Kernel → Change Kernel)
+3. Ensure your PostgreSQL credentials are set in `.env`
+4. Run the cells to execute SQL queries from the test cases
 
-Please post-process your collected results as the format: SQL and its `db_id`, which is splitted by `'\t----- bird -----\t'`. The examples are shown in the [`./exp_result/turbo_output/predict_mini_dev_gpt-4-turbo_cot_SQLite.json`](./exp_result/turbo_output/predict_mini_dev_gpt-4-turbo_cot_SQLite.json). Put the ground-truth sql file in the [`./data/`](./data/). And you may need to design a ChatGPT tag by your own.
-The main file for ex evaluation is located at [`./src/evaluation_ex.py`](./src/evaluation_ex.py). \
-Then you could evaluate the results by the following command line :
+### Running VizQL Data Service Queries
 
-```bash
-cd ./src/
-sh ./run_evaluation.sh
-```
+1. Open `data/test_cases/california_schools_vds_samples.ipynb` in Jupyter
+2. **Select the "Python (bird-mini)" kernel** from the kernel menu (Kernel → Change Kernel)
+3. Ensure your Tableau Server credentials and datasource LUIDs are configured in `.env`
+4. Run the cells to execute VizQL queries against published Tableau datasources
 
-### Reward-based Valid Efficiency Score (R-VES):
-The main file for R-VES evaluation is located at [`./src/evaluation_ves.py`](./src/evaluation_ves.py).
-R-VES and EX can be evaluated in the same shell, so you can eval your efficiency via:
+The test cases use the following datasource variables:
+- `california_schools_fprm_satscores`: FRPM + SAT Scores joined datasource
+- `california_schools_frpm_schools`: FRPM + Schools joined datasource
+- `california_schools_satscores_schools`: SAT Scores + Schools joined datasource
 
-```bash
-cd ./src/
-sh ./run_evaluation.sh
-```
-(For stable R-VES, you may need to enlarge `timeout` or repeat and average results. In our test evaluation, we will enlarge `timeout` to 3 s/ex; then we repeat 5 times for VES computation, only the highest results will be reported.)
+## Datasources
 
-In the latest version, we adjust the VES evaluation to be more stable and reliable. Instead of simply measuring the time ratio between predict and ground-truth SQLs, we now assign reward point based on the time ratio. The R-VES are calculated as follows:
-<p align="center" width="100%">
-<a><img src="materials/time_ratio_formula.png" style="width: 70%; min-width: 300px; display: block; margin: auto;"></a>
-</p>
+The project requires three Tableau datasources:
+1. **california_schools_fprm_satscores**: Combines Free/Reduced Price Meals data with SAT scores
+2. **california_schools_frpm_schools**: Combines FRPM data with school information
+3. **california_schools_satscores_schools**: Combines SAT scores with school information
 
+## Test Cases
 
+Test cases are organized by question ID and include:
+- Natural language question
+- Evidence/hints for query construction  
+- SQL query (for PostgreSQL tests)
+- VizQL query structure (for VizQL tests)
+- Difficulty level
+- AI-summarized expected answer
 
-### Soft F1-Score Evaluation:
-The main file for Soft F1-Score evaluation is located at [`./src/evaluation_f1.py`](./src/evaluation_f1.py). Soft-F1, VES and EX can be evaluated in the same shell, so you can eval your efficiency via:
+## Contributing
 
-```bash
-cd ./src/
-sh ./run_evaluation.sh
-```
-#### Soft F1-Score:
-Alongside the update to the Mini-Dev set, we introduced a new evaluation metric—the soft F1-score. This metric is specifically designed to assess the performance of text-to-SQL models by measuring the similarity between the tables produced by predicted SQL queries and those from the ground truth. In a nutshell, the soft F1-score is a more lenient metric that reduces the impact of column order and missing values in the tables produced by predicted SQL queries.
-
-The following demonstrate how we calculate the soft F1-score. 
-
-Ground truth SQL resulted table:
-| Row  |  | |  
-|:----------:|:----------:|:----------:|
-| 1 | 'Apple' | 325 | 
-| 2  | 'Orange' |  | 
-| 3| 'Banana' | 119 |
-
-Predicted SQL resulted table:
-| Row |  | |  
-|:----------:|:----------:|:----------:|
-| 1 | 325 |'Apple' |  
-| 2  | 191 |'Orange' |  
-| 3| |'Banana' |
-
-The soft F1-score is calculated as follows:
-
-|  | Matched| Pred_only | Gold_only  |
-|----------|:----------:|:----------:|:----------:|
-| **Row 1** | 2 | 0 | 0 | 
-| **Row 2** | 1 | 1 | 0 | 
-| **Row 3** | 1 | 0 | 1 | 
-
-* tp = SUM(Matched) = 4 
-* fp = SUM(Pred_only) = 1
-* fn = SUM(Gold_only) = 1
-* Precision = tp / (tp + fp) = 4 / 5 = 0.8
-* Recall = tp / (tp + fn) = 4 / 5 = 0.8
-* F1 = 2 * Precision * Recall / (Precision + Recall) = 0.8
+When adding new test cases:
+1. Add SQL queries to `data/mini_dev_postgresql.json`
+2. Add VizQL queries to `data/mini_dev_vds.json`
+3. Ensure queries follow the existing structure
+4. Test queries in the respective notebooks
