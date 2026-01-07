@@ -2,3 +2,4 @@
 __pycache__
 .venvgit
 data/dev_databases/**/*.sqlite
+.env

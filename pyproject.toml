@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bird-mini-tableau-refactor"
+version = "0.1.0"
+description = "Refactored BIRD Mini Text-to-SQL benchmark for evaluating agents that generte and VizQL Data Service against Tableau published data sources."
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Joe Constantino", email = "joe.constantino3@gmail.com"}
+]
+
+dependencies = [
+    "pandas>=2.0.0",
+    "requests>=2.32.0",
+    "psycopg2-binary>=2.9.0",
+    "sqlalchemy>=2.0.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "jupyter>=1.0.0",
+    "ipython>=8.0.0",
+]
+
+notebook = [
+    "jupyter>=1.0.0",
+    "ipython>=8.0.0",
+    "notebook>=7.0.0",
+]
+
+test = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+
+[tool.setuptools]
+packages = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/bird_mini"
+Repository = "https://github.com/yourusername/bird_mini"
+
